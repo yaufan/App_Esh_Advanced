@@ -7,7 +7,8 @@ Usage (在 data-pipeline/ 執行): python3 scripts/mark_verified.py <批次> [ba
 1. validate.py 零錯誤；
 2. 每個小題都有第一輪審題紀錄（reviews/review_<批次>.json），fail 的小題已刪除；
 3. 第一輪被修改的小題（reviews/modified_<批次>.json）都經過複審，而且最後一次複審是 pass
-   （複審紀錄依序為 reviews/recheck_*.json、reviews/recheck_round3.json；後面的輪次蓋過前面的）。
+   （複審紀錄依序為 reviews/recheck_*.json、reviews/recheck_round3.json、reviews/audit_*/recheck_audit*.json；後面的輪次蓋過前面的）。
+4. 全面查核後修改的小題（reviews/audit_*/modified_audit*.json）也要有複審且最後一次是 pass。
 通過後把題庫複製到 verified/。
 """
 import glob, json, os, subprocess, sys
@@ -29,12 +30,17 @@ assert not unreviewed, f'items without review: {unreviewed}'
 
 # 修正後複審：後面的輪次蓋過前面的
 final = {}
-rounds = sorted(f for f in glob.glob('reviews/recheck_*.json') if 'round3' not in f) + sorted(glob.glob('reviews/recheck_round3.json'))
+rounds = (sorted(f for f in glob.glob('reviews/recheck_*.json') if 'round3' not in f)
+          + sorted(glob.glob('reviews/recheck_round3.json'))
+          + sorted(glob.glob('reviews/audit_*/recheck_audit*.json')))
 for f in rounds:
     for x in json.load(open(f)):
         final[x['itemId']] = x['verdict']
 mod_path = f'reviews/modified_{X}.json'
 modified = set(json.load(open(mod_path))) if os.path.exists(mod_path) else set()
+# 全面查核（盲解＋比對裁定）後修改的小題，也要經過複審
+for f in glob.glob('reviews/audit_*/modified_audit*.json'):
+    modified |= set(json.load(open(f)))
 fixed_first_round = {k for k, v in verdict.items() if v == 'fix'}
 need_recheck = (modified | fixed_first_round) & ids
 missing = {k for k in need_recheck if k not in final}

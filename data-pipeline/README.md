@@ -13,6 +13,7 @@
 | `examples/example.json` | 格式示範大題（不進 APP） |
 | `reviews/review_*.json` | 獨立審題紀錄，每個小題一筆：verdict（pass／fix／fail）、問題、修正與處理結果 |
 | `reviews/recheck_*.json` | 修正後的題目由另一位審題者複審的紀錄 |
+| `reviews/audit_20261115_adv/` | 2026-11-15 全面查核：盲解答案（`blind/`，查核者只看題目與條文作答）、逐題比對裁定（`judge_*.json`）、依裁定修改的小題（`modified_audit.json`）與修改後的獨立複審（`recheck_audit.json`）；作業說明在 `tools/` |
 | `SCHEMA.md` | 題庫格式（大題 20 分；小題的解題四步：think、citations、solve、modelAnswer）與出題鐵則 |
 | `EXTRA_RULES.md` | 審題後確立的補充規則（概括條款、洩題、重複、限定詞等） |
 | `AGENT_BRIEF.md`／`REVIEW_BRIEF.md` | 出題、審題的作業規範 |

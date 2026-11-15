@@ -2,7 +2,7 @@
   "expo": {
     "name": "職安甲級術科解題",
     "slug": "esh-advanced",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "eshadvanced",
