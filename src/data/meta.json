@@ -1,0 +1,14 @@
+{
+ "bankVersion": "2026.11.15",
+ "lawsRetrievedAt": "2026-11-15",
+ "lawSource": "全國法規資料庫（原 30 部經官方網站逐條比對；2026-11-15 新增 14 部取自官方 API 公開鏡像）",
+ "verifiedAt": "2026-11-15",
+ "counts": {
+  "groups": 55,
+  "items": 217,
+  "self": 55,
+  "official": 0,
+  "safety": 30,
+  "hygiene": 25
+ }
+}
