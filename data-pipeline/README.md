@@ -5,7 +5,7 @@
 | 路徑 | 內容 |
 |---|---|
 | `laws_raw/` | 44 部法規的原始 JSON（全國法規資料庫官方 API 的公開鏡像 kong0107/mojLawSplitJSON） |
-| `corpus/laws.json` | 依據庫：逐條文字＋章節＋施行狀態。原 30 部（與乙級 APP 相同）曾與 law.moj.gov.tw 官方網站逐條比對雜湊值，4 條不一致處改用官方原文；2026-11-15 新增的 14 部取自同一鏡像，尚未和官方網站逐條比對 |
+| `corpus/laws.json` | 依據庫：逐條文字＋章節＋施行狀態。44 部都已與 law.moj.gov.tw 官方網站逐條比對雜湊值：原 30 部有 4 條、新增 14 部有 8 條不一致處改用官方原文（`corpus/official_patch_20261115.json`），比對紀錄見 `reviews/audit_20261115_adv/official_compare.md` |
 | `corpus/text/` | 每部法規一個文字檔（給出題與審題用），標出 `[尚未施行-禁止出題]`、`[附表尚未施行]` |
 | `corpus/attachments_N0060017.json` | 有機溶劑中毒預防規則附表一、二、四（自官方網站 PDF 轉文字） |
 | `bank/self_SAF-*.json` | 職業安全管理甲級自編大題（A 法規、B 管理、C 機械電氣、D 營造墜落、E 起重鍋爐與危險性機械、F 高壓氣體火災爆炸局限空間缺氧） |

@@ -270,7 +270,7 @@ export default function Home() {
           onPress={() => router.push({ pathname: '/practice', params: { tab: 'official' } })}
         />
         <QuickTile icon="refresh-circle-outline" title="錯題複習" sub={`今天到期 ${today.dueIds.length} 題`} tint={colors.danger} onPress={() => router.push('/review')} />
-        <QuickTile icon="albums-outline" title="要點速記卡" sub={`${nCards} 張・翻牌回想答案`} tint={colors.cat2} onPress={() => router.push('/cards')} />
+        <QuickTile icon="albums-outline" title="要點背誦" sub={`${nCards} 題・翻牌或逐行回想`} tint={colors.cat2} onPress={() => router.push('/cards')} />
         <QuickTile icon="library-outline" title="查法規" sub="題目引用的條文全文" tint={colors.cat3} onPress={() => router.push('/laws')} />
       </View>
 

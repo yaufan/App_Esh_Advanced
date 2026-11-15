@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText, Button, Card, Divider, IconButton, Screen, SectionTitle } from '@/components/ui/primitives';
+import { ReminderSetting } from '@/components/ui/reminder-setting';
 import { Sheet } from '@/components/ui/sheet';
 import { exportBackup, parseBackup, pickBackupText, type ParsedBackup } from '@/lib/backup';
 import { laws, meta } from '@/lib/bank';
@@ -93,7 +94,7 @@ export default function About() {
         <Row
           icon="calendar-outline"
           title={`法規版本：${meta.lawsRetrievedAt}`}
-          body={`共 ${laws.length} 部法規，取自全國法規資料庫（官方開放資料）。已公布但尚未施行的條文不拿來出題。法規之後若再修正，答案可能需要更新。`}
+          body={`共 ${laws.length} 部法規，取自全國法規資料庫，並已和官方網站逐條比對。已公布但尚未施行的條文不拿來出題。法規之後若再修正，答案可能需要更新。`}
         />
         <Row
           icon="create-outline"
@@ -171,6 +172,8 @@ export default function About() {
           </AppText>
           <Ionicons name={settings.haptics ? 'toggle' : 'toggle-outline'} size={36} color={settings.haptics ? colors.success : colors.inkMute} />
         </Pressable>
+        <Divider />
+        <ReminderSetting />
         <Divider />
         <Button title="清除所有作答紀錄" variant="danger" icon="trash-outline" compact onPress={() => setConfirm(true)} />
       </Card>

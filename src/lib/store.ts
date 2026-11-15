@@ -37,6 +37,10 @@ type Settings = {
   studyMode?: boolean;
   /** 目前練習的職類 */
   exam?: Exam;
+  /** 每日複習提醒（手機本機通知） */
+  reminderOn?: boolean;
+  /** 提醒時間 HH:MM */
+  reminderTime?: string;
   /** 字體大小倍率：1 標準、1.12 大、1.25 特大 */
   fontScale?: number;
   /** 考試日期 YYYY-MM-DD */

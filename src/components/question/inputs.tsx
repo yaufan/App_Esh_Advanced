@@ -143,7 +143,7 @@ export function FillQ({ item, answer, onChange, review, result }: QProps<FillIte
           );
         })}
       </View>
-      {!review && <Hint icon="keypad-outline">點空格用數字鍵盤輸入，與正式考試相同</Hint>}
+      {!review && <Hint icon="keypad-outline">點空格用數字鍵盤輸入計算結果</Hint>}
       <NumericKeypadSheet
         visible={open != null}
         initial={open ? v[open] ?? '' : ''}

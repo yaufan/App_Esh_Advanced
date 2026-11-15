@@ -7,7 +7,7 @@ import { AppText, Button, useHaptic } from './primitives';
 import { Sheet } from './sheet';
 
 /**
- * 仿官方術科電腦化測試的數字鍵盤：只能輸入數字、小數點、負號。
+ * 輸入計算結果用的數字鍵盤：只能輸入數字、小數點、負號。
  */
 export function NumericKeypadSheet({
   visible,

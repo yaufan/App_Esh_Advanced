@@ -15,7 +15,7 @@ const KEYS: { k: string; kind?: 'op' | 'fn' | 'eq' | 'clr' }[][] = [
   [{ k: '0' }, { k: '.' }, { k: 'ln', kind: 'fn' }, { k: '=', kind: 'eq' }],
 ];
 
-/** 作答時可叫出的計算機（官方電腦化測試也提供計算機） */
+/** 作答時可叫出的計算機 */
 export function CalculatorSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const { colors } = useTheme();
   const haptic = useHaptic();

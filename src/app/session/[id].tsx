@@ -49,12 +49,16 @@ export default function SessionScreen() {
   const submit = useAppStore((st) => st.submit);
   const toggleFlag = useAppStore((st) => st.toggleFlag);
   const [calc, setCalc] = useState(false);
+  // 單題計時（練習用）：一個大題依配分換算建議時間（20 分＝24 分鐘，和考試 2 小時 100 分同比例）
+  const [timerOn, setTimerOn] = useState(false);
+  const [timerStart, setTimerStart] = useState(0);
+  const [timerIdx, setTimerIdx] = useState(-1);
   const [confirm, setConfirm] = useState<null | 'submit' | 'leave'>(null);
   const [showOriginal, setShowOriginal] = useState(false);
   const scrollRef = useRef<ScrollViewInstance>(null);
 
   const isMock = s?.mode === 'mock';
-  const now = useNow(!!s && isMock && !s.submittedAt);
+  const now = useNow(!!s && ((isMock && !s.submittedAt) || timerOn));
   const left = s ? remainingSec(s, now) : null;
 
   const groupsInSession: Group[] = useMemo(
@@ -101,6 +105,15 @@ export default function SessionScreen() {
   const study = s.mode === 'study';
   const last = idx >= groupsInSession.length - 1;
   const lowTime = left != null && left <= 300;
+  const canTime = !isMock && !study && !locked;
+  // 換到別的大題時，計時重新開始
+  if (timerOn && timerIdx !== idx) {
+    setTimerIdx(idx);
+    setTimerStart(now);
+  }
+  const targetSec = Math.round(items.reduce((n, it) => n + it.points, 0) * 1.2 * 60);
+  const elapsedSec = timerOn ? Math.max(0, Math.floor((now - timerStart) / 1000)) : 0;
+  const overTime = timerOn && elapsedSec > targetSec;
 
   const go = (i: number) => {
     haptic('light');
@@ -152,6 +165,32 @@ export default function SessionScreen() {
                 {fmtClock(left)}
               </AppText>
             </View>
+          )}
+          {canTime && timerOn && (
+            <Pressable
+              onPress={() => setTimerOn(false)}
+              accessibilityLabel="關閉單題計時"
+              style={[styles.timer, { backgroundColor: overTime ? colors.danger : 'rgba(255,255,255,0.1)' }]}>
+              <Ionicons name="stopwatch-outline" size={16} color={overTime ? '#fff' : colors.accent} />
+              <AppText variant="bodyStrong" mono color={overTime ? '#fff' : colors.heroInk}>
+                {fmtClock(elapsedSec)}
+              </AppText>
+              <AppText variant="caption" mono color={overTime ? '#fff' : colors.inkMute}>
+                /{Math.round(targetSec / 60)}′
+              </AppText>
+            </Pressable>
+          )}
+          {canTime && !timerOn && (
+            <IconButton
+              icon="stopwatch-outline"
+              label="單題計時"
+              color={colors.heroInk}
+              onPress={() => {
+                setTimerOn(true);
+                setTimerIdx(idx);
+                setTimerStart(Date.now());
+              }}
+            />
           )}
           <IconButton icon="calculator-outline" label="計算機" color={colors.heroInk} onPress={() => setCalc(true)} />
         </View>

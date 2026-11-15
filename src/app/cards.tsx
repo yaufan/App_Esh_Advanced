@@ -36,6 +36,59 @@ function CardBack({ card }: { card: PointCard }) {
   );
 }
 
+/** 逐行背誦：每行只露出開頭幾個字，點一下顯示整行 */
+const HINT_CHARS = 3;
+function maskLine(line: string) {
+  const m = /^(\d+\.\s*)?(.*)$/.exec(line) ?? [line, '', line];
+  const head = m[1] ?? '';
+  const body = m[2] ?? '';
+  return head + body.slice(0, HINT_CHARS) + (body.length > HINT_CHARS ? ' ……' : '');
+}
+
+function ReciteLines({ card, onAllShown }: { card: PointCard; onAllShown: () => void }) {
+  const { colors } = useTheme();
+  const lines = card.item.modelAnswer ?? [];
+  const [shown, setShown] = useState<boolean[]>(() => lines.map(() => false));
+  const reveal = (i: number) => {
+    const next = shown.map((v, j) => v || j === i);
+    setShown(next);
+    if (next.every(Boolean)) onAllShown();
+  };
+  return (
+    <View style={{ gap: space.sm }}>
+      <AppText variant="caption" color={colors.inkSoft}>
+        考卷上這樣寫・先回想整句，再點一下核對
+      </AppText>
+      {lines.map((line, i) => (
+        <Pressable
+          key={i}
+          onPress={() => reveal(i)}
+          accessibilityLabel={shown[i] ? line : `第 ${i + 1} 行，點一下顯示`}
+          style={({ pressed }) => [
+            styles.line,
+            { borderColor: shown[i] ? colors.success : colors.line, backgroundColor: shown[i] ? colors.successSoft : colors.surfaceAlt, opacity: pressed ? 0.85 : 1 },
+          ]}>
+          <AppText variant="body" color={shown[i] ? colors.ink : colors.inkSoft}>
+            {shown[i] ? line : maskLine(line)}
+          </AppText>
+        </Pressable>
+      ))}
+      {!shown.every(Boolean) && (
+        <Button
+          title="全部顯示"
+          variant="ghost"
+          compact
+          icon="eye-outline"
+          onPress={() => {
+            setShown(lines.map(() => true));
+            onAllShown();
+          }}
+        />
+      )}
+    </View>
+  );
+}
+
 export default function Cards() {
   const { colors } = useTheme();
   const haptic = useHaptic();
@@ -50,6 +103,7 @@ export default function Cards() {
   const [pos, setPos] = useState(0);
   const [back, setBack] = useState(false);
   const [total, setTotal] = useState(deck.length);
+  const [recite, setRecite] = useState(false);
 
   const restart = (c: Cat, h: boolean) => {
     const d = buildDeck(exam, c, h);
@@ -86,12 +140,39 @@ export default function Cards() {
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: space.sm }}>
         <IconButton icon="chevron-back" label="返回" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
         <View style={{ flex: 1 }}>
-          <AppText variant="title">要點速記卡</AppText>
+          <AppText variant="title">要點背誦</AppText>
           <AppText variant="caption" color={colors.inkSoft}>
-            {examMeta[exam].name}・正面題目、背面「考卷上這樣寫」・由審過的題目產生
+            {examMeta[exam].name}・由審過的題目產生
           </AppText>
         </View>
       </View>
+
+      <View style={[styles.seg, { backgroundColor: colors.surfaceAlt }]}>
+        {(
+          [
+            [false, '翻牌', 'albums-outline'],
+            [true, '逐行背誦', 'list-outline'],
+          ] as const
+        ).map(([v, label, icon]) => (
+          <Pressable
+            key={label}
+            onPress={() => {
+              setRecite(v);
+              setBack(false);
+            }}
+            accessibilityRole="radio"
+            accessibilityState={{ checked: recite === v }}
+            style={[styles.segBtn, recite === v && { backgroundColor: colors.surface, borderColor: colors.line }]}>
+            <Ionicons name={icon} size={16} color={recite === v ? colors.ink : colors.inkSoft} />
+            <AppText variant="smallStrong" color={recite === v ? colors.ink : colors.inkSoft}>
+              {label}
+            </AppText>
+          </Pressable>
+        ))}
+      </View>
+      <AppText variant="caption" color={colors.inkSoft}>
+        {recite ? '每行只露出開頭幾個字，先回想整句再點開核對；全部核對完再選「記得了／還不熟」。' : '正面是題目，先在心裡或紙上寫出要點，再翻到背面看「考卷上這樣寫」。'}
+      </AppText>
 
       <View style={{ flexDirection: 'row', gap: space.sm }}>
         {([0, 1, 2, 3] as const).map((c) => {
@@ -157,11 +238,12 @@ export default function Cards() {
       ) : (
         <>
           <Pressable
+            disabled={recite}
             onPress={() => {
               haptic('light');
               setBack((b) => !b);
             }}
-            accessibilityLabel={back ? '翻回正面' : '顯示答案'}
+            accessibilityLabel={recite ? undefined : back ? '翻回正面' : '顯示答案'}
             style={[styles.card, { backgroundColor: colors.surface, borderColor: back ? colors.success : colors.line }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
               <Tag label={categoryMeta[card.group.category].short} color="#fff" bg={colors[categoryMeta[card.group.category].key]} />
@@ -180,8 +262,12 @@ export default function Cards() {
             <AppText variant="body" style={{ fontWeight: '600' }}>
               {plainStem(card.item.stem)}
             </AppText>
-            {back && <CardBack card={card} />}
-            {!back && (
+            {recite ? (
+              <ReciteLines key={card.item.id} card={card} onAllShown={() => setBack(true)} />
+            ) : (
+              back && <CardBack card={card} />
+            )}
+            {!back && !recite && (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, justifyContent: 'center', paddingTop: space.sm }}>
                 <Ionicons name="hand-left-outline" size={15} color={colors.inkMute} />
                 <AppText variant="caption" color={colors.inkMute}>
@@ -204,7 +290,7 @@ export default function Cards() {
                 <CitationCard key={i} c={c} expanded />
               ))}
             </>
-          ) : (
+          ) : recite ? null : (
             <Button title="顯示答案" variant="primary" icon="eye-outline" onPress={() => setBack(true)} />
           )}
         </>
@@ -217,4 +303,7 @@ const styles = StyleSheet.create({
   chip: { flex: 1, borderWidth: 1.5, borderRadius: radius.md, paddingVertical: 9, alignItems: 'center' },
   card: { borderWidth: 1.5, borderRadius: radius.lg, padding: space.lg, gap: space.md, minHeight: 220 },
   answer: { borderRadius: radius.md, padding: space.md, gap: 6 },
+  line: { borderWidth: 1, borderRadius: radius.md, padding: space.md },
+  seg: { flexDirection: 'row', borderRadius: radius.md, padding: 4 },
+  segBtn: { flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6, paddingVertical: 9, borderRadius: radius.sm, borderWidth: 1, borderColor: 'transparent' },
 });

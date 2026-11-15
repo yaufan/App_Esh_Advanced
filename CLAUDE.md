@@ -17,14 +17,16 @@
   4. `data-pipeline/scripts/mark_verified.py` 通過後，才用 `build_app_data.py` 產生 `src/data/`。
 - 出題規範：`data-pipeline/AGENT_BRIEF.md`、`data-pipeline/EXTRA_RULES.md`。審題確立的規則：「其他有關…事項」等概括條款不列為得分要點；大題標題、topic 不可洩題；同一大題的小題在同一頁，不可互相洩題；不寫條文以外的經驗說法（「常考」「口訣」「得分重點」「陷阱」「注意不要混淆」「實務上」等，validate.py 會擋）；引號裡的條文用語要和條文逐字相同；新題要和既有題庫比對，同條文同考點的擇一保留。
 - 已公布但尚未施行的條文（依據庫標 `[尚未施行-禁止出題]`）不出題；`[附表尚未施行]` 不考附表數值。法規修正時照 `data-pipeline/README.md` 重跑。
-- 依據庫 44 部法規：原 30 部（與乙級相同，曾和官方網站逐條比對）＋ 2026-11-15 新增 14 部（取自全國法規資料庫官方 API 的公開鏡像 kong0107/mojLawSplitJSON；本環境連不到 law.moj.gov.tw，尚未逐條和官方網站比對）。
+- 依據庫 44 部法規：原 30 部（與乙級相同）＋ 2026-11-15 新增 14 部，都取自全國法規資料庫官方 API 的公開鏡像 kong0107/mojLawSplitJSON，並已和官方網站逐條比對（新增 14 部的比對紀錄在 `data-pipeline/reviews/audit_20261115_adv/official_compare.md`；雲端環境連不到 law.moj.gov.tw，是用使用者電腦的內建瀏覽器取官方頁面算雜湊）。
 - **官方歷屆題**：官方網站擋自動下載，要請使用者下載術科試題 PDF 傳進對話。題目原文逐字照錄（`originalText`），解題依現行法撰寫；需要教科書原理、CNS、技術指引、圖表或依據庫以外資料才能作答的小題不收（`partial`＋`omittedParts` 寫原因），整題都無法作答的列入排除清單。法規修正註記（`lawChangeNote`）的日期只能用依據庫 `laws.json` 的 modified／effectiveNote。
 - APP 不連網、沒有帳號、沒有廣告，作答紀錄只存在手機（AsyncStorage，key `esh-adv-v1`）。備份是匯出檔案交給手機的分享功能，回報題目是開分享或瀏覽器，APP 本身都不連網；不要加會帶入網路、定位、廣告權限的套件（release.yml 會擋）。
 - 職類：`settings.exam`（`safety`／`hygiene`），首頁切換；題庫、模擬考、錯題本、統計、速記卡都只看目前職類（`useExam()`）。
 - 作答階段（`renderer.tsx` 的 `Phase`）：`answer` 模擬考作答中（只看題目、在紙上寫）、`learn` 練習（一步一步看解題，最後自評）、`review` 已看過或已交卷（全部展開，可再自評）、`study` 直接看完整解題（不計分）。
 - 作答結果一律經 `store.ts` 的 `applyResult()` 記錄（滿分率、錯題本、間隔複習 `srs`、每日紀錄 `daily`）。問答題用 `selfGrade()`（交卷後也能自評，第一次自評時記錄）；計算題在看完解題（`reveal()`）或交卷時記錄。拿滿分才算「答對」。間隔複習：沒拿滿分隔 1、3、7、14 天複習，到期拿滿分才進下一階。新增要保存的狀態時，`backup.ts` 的匯出與 `parseBackup()` 檢查都要一起補。
 - 文字大小：用 `AppText` 或 `useType()`，不要直接用 tokens 的 `type`，否則「字體大小」設定不會生效。元件裡不要直接呼叫 `Date.now()`（lint 會擋），用 `useNow()`。
-- 要點速記卡（`pointCardsOf`）、法條反查（`citedBy`）、搜尋（`searchGroups`）都是由審過的題庫機械產生，不另外編內容。
+- 要點背誦（`cards.tsx`：翻牌／逐行背誦，逐行只露出每行開頭 3 個字）、法條反查（`citedBy`）、搜尋（`searchGroups`）都是由審過的題庫機械產生，不另外編內容。
+- 單題計時（練習時作答畫面右上角）：建議時間依配分換算（20 分＝24 分鐘，和考試 2 小時 100 分同比例），只在畫面上顯示，不記錄。
+- 每日複習提醒（`src/lib/reminder.ts`）是手機本機排程通知（expo-notifications），每次開 APP、作答、改設定時重排接下來 7 天，內容是當天到期的錯題數；套件附帶的推播權限（網路狀態、c2dm、AD_ID）在 `plugins/withAndroidRelease.js` 拿掉。
 - 圖示由 `tools/make_icons.py` 產生（深綠底、黃盾牌、「甲」字），和乙級的深藏青圖示區分。
 
 ## 發布（做成可以安裝的 APK、給下載 QR code）

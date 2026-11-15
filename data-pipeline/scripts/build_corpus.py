@@ -19,6 +19,10 @@ PENDING = {
 # article text fine but an attached table (附表) is pending -> do not ask about attached table values
 TABLE_PENDING = {'N0060004':['2'], 'N0060010':['3','4','5'], 'N0060022':['2','16'], 'N0060054':['5','12'], 'N0060032':['2']}
 SKIP = {'N0060041'}
+# 2026-11-15 新增 14 部法規與官方網站逐條比對（內建瀏覽器取官方頁面文字算雜湊）：
+# 只有標點字形不同的 8 條改用官方原文（︰、‧）；高壓氣體勞工安全規則第 18 條官方網頁以私用區字元 U+F6F6 顯示乘號，
+# 鏡像資料寫成「×」，意思相同，保留鏡像文字；第 20、221 條與優先管理化學品辦法第 6 條官方網頁註明排版無法完整呈現，保留鏡像文字。
+OFFICIAL_PATCH_2 = json.load(open('../corpus/official_patch_20261115.json'))
 def label(n):
     a,b = divmod(n,100); return f"{a}" if b==0 else f"{a}-{b}"
 def flat(content, depth=0):
@@ -48,6 +52,8 @@ for f in sorted(glob.glob('../laws_raw/*.json')):
         no=label(a['number']); txt='\n'.join(flat(a.get('content',[])))
         if (p,no) in OFFICIAL_PATCH:
             t,h=OFFICIAL_PATCH[(p,no)]; assert hashlib.sha1(norm(t).encode()).hexdigest()[:10]==h, (p,no); txt=t
+        if f"{p}#{no}" in OFFICIAL_PATCH_2:
+            e=OFFICIAL_PATCH_2[f"{p}#{no}"]; assert hashlib.sha1(norm(e['text']).encode()).hexdigest()[:10]==e['sha1_10'], (p,no); txt=e['text']
         ch=''
         for s,e,title,pre in chs:
             if s<=a['number']<=e: ch=(pre+title)
@@ -65,7 +71,7 @@ for f in sorted(glob.glob('../laws_raw/*.json')):
     laws.append({'pcode':p,'name':d['name'],'modified':roc(d['LawModifiedDate']),'modifiedRaw':d['LawModifiedDate'],
                  'effectiveNote':d.get('effectiveNote',''),'attachments':list(d.get('attachments',{}).values()),
                  'url':f"https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode={p}",'articles':arts})
-json.dump({'retrievedAt':'2026-11-15','source':'全國法規資料庫（原 30 部經官方網站逐條比對；2026-11-15 新增 14 部取自官方 API 公開鏡像）','laws':laws},
+json.dump({'retrievedAt':'2026-11-15','source':'全國法規資料庫（44 部法規均已與官方網站逐條比對）','laws':laws},
           open('../corpus/laws.json','w'),ensure_ascii=False,indent=0)
 # also one text file per law for agents to read
 import os
