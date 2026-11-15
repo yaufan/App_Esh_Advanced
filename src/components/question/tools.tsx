@@ -11,7 +11,7 @@ import { useAppStore } from '@/lib/store';
 import type { Item } from '@/lib/types';
 import { radius, space, useTheme, useType } from '@/theme';
 
-const ISSUES_URL = 'https://github.com/yaufan/app_esh_advanced/issues/new';
+const ISSUES_URL = 'https://github.com/yaufan/App_Esh_Advanced/issues/new';
 
 function reportText(item: Item) {
   return [

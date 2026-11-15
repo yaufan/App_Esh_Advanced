@@ -1,4 +1,4 @@
-# 職安甲級術科解題（app_esh_advanced）
+# 職安甲級術科解題（App_Esh_Advanced）
 
 職業安全管理甲級（22000）、職業衛生管理甲級（22100）技術士**術科**的手機練習 APP（Expo / React Native）。甲級術科是紙筆問答（5 大題、每題 20 分、2 小時、60 分及格），所以這個 APP 以「**看解題思路**」為主，而不是模擬電腦化作答。
 
@@ -64,7 +64,7 @@ python3 build_app_data.py ../../src/data ../bank/*.json  # 產生 src/data/bank.
    - **Release** 工作流程（`.github/workflows/release.yml`）在版本還沒發布過時，用 Expo prebuild＋Gradle 打包 arm64／armv7／x86_64 三個 APK，以測試金鑰簽章、檢查簽章指紋與權限，放上 GitHub Releases，約 15～40 分鐘。
 3. 本專案是公開的，GitHub Actions 不扣每月額度。
 4. 簽章用和其他 APP 同一把測試金鑰：在 GitHub 專案頁 Settings → Secrets and variables → Actions → **Repository secrets** 加 `ANDROID_KEYSTORE_BASE64`、`ANDROID_KEYSTORE_PASSWORD`。金鑰與密碼不可放進 git。正式上架 Google Play 前要換成正式的上傳金鑰。
-5. 做某一版的下載 QR code：`python3 tools/make_qr.py "<APK 網址>" qr.png "職安甲級術科解題 X.Y.Z" "Android 手機掃描，直接下載安裝" "github.com/yaufan/app_esh_advanced|releases/download/vX.Y.Z/<檔名>"`（需要 `pip install segno pillow`）。
+5. 做某一版的下載 QR code：`python3 tools/make_qr.py "<APK 網址>" qr.png "職安甲級術科解題 X.Y.Z" "Android 手機掃描，直接下載安裝" "github.com/yaufan/App_Esh_Advanced|releases/download/vX.Y.Z/<檔名>"`（需要 `pip install segno pillow`）。
 
 APP 識別碼：`com.yaufan.eshadvanced`。簽章、分機型打包、正式版移除網路與檔案權限，都寫在 `plugins/withAndroidRelease.js`（Expo config plugin），不要手動改 `android/`（它是 prebuild 產生的，不放進 git）。
 
