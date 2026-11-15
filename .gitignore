@@ -41,3 +41,6 @@ example
 # generated native folders
 /ios
 /android
+
+# 審題閘門的暫存副本
+data-pipeline/verified/
